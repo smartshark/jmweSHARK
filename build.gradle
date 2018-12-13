@@ -1,0 +1,46 @@
+allprojects {
+	repositories {
+	  	jcenter()
+	  }
+  
+	//Plugins applyen
+	apply plugin:'java'
+	apply plugin:'eclipse'
+	//Decoding
+	compileJava.options.encoding = 'UTF-8'
+	
+	tasks.withType(JavaCompile) {
+	    options.encoding = 'UTF-8'
+	}
+}
+
+apply plugin: 'application'
+mainClassName = 'de.ugoe.cs.smartshark.jmweSHARK.JmweSHARK'
+	
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.21'
+	compile "commons-cli:commons-cli:1.4"
+	compile "ch.qos.logback:logback-classic:1.2.3"
+	
+    testCompile 'junit:junit:4.12'
+}
+
+//Projektversion wird über die gradle.properties gesetzt
+if (project.hasProperty('projectVersion')) {
+  project.version = project.projectVersion
+} else {
+  project.version = findProperty('projectVersion');
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'SmartSHARK jmweSHARK',  
+        	'Implementation-Version': 1,
+        	'Main-Class': 'de.ugoe.cs.smartshark.jmweSHARK.JmweSHARK'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
