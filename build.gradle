@@ -20,9 +20,13 @@ mainClassName = 'de.ugoe.cs.smartshark.jmweSHARK.JmweSHARK'
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.21'
-	compile "commons-cli:commons-cli:1.4"
-	compile "ch.qos.logback:logback-classic:1.2.3"
-	
+    compile "commons-cli:commons-cli:1.4"
+    compile "ch.qos.logback:logback-classic:1.2.3"
+
+    // Smartshark Data-Models 
+    compile 'io.github.smartshark:jSHARK:2.0.3'
+    compile 'org.mongodb.morphia:morphia:1.3.2'
+    
     testCompile 'junit:junit:4.12'
 }
 
