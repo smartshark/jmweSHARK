@@ -11,16 +11,46 @@ import java.util.List;
 *
  */
 public class JmweShark {
-  public static int STORED_REFACTORINGS;
-
+  
   public static void main(String[] args) {
     Parameter param = Parameter.getInstance();
     param.init(args);
-
-    setLogLevel();
-
-
    
+		final Datastore datastore = createDatastore();		
+		Query<Project> projects = datastore.createQuery(Project.class);
+    
+    for (Project project : projects) {
+			System.out.println(project.getName());
+    }
+    
+    setLogLevel();
+  
+  }
+  
+  private Datastore createDatastore() {
+    Morphia morphia = new Morphia();
+    morphia.mapPackage("de.ugoe.cs.smartshark.refshark.model");
+    Datastore datastore = null;
+
+    try {
+      if (Parameter.getInstance().getUrl().isEmpty() || Parameter.getInstance().getDbPassword().isEmpty()) {
+        datastore = morphia.createDatastore(new MongoClient(Parameter.getInstance().getDbHostname(), Parameter.getInstance().getDbPort()), Parameter.getInstance().getDbName());
+      } else {
+        ServerAddress addr = new ServerAddress(Parameter.getInstance().getDbHostname(), Parameter.getInstance().getDbPort());
+        List<MongoCredential> credentialsList = Lists.newArrayList();
+        MongoCredential credential = MongoCredential.createCredential(
+            Parameter.getInstance().getDbUser(), Parameter.getInstance().getDbAuthentication(), Parameter.getInstance().getDbPassword().toCharArray());
+        credentialsList.add(credential);
+        MongoClient client = new MongoClient(addr, credentialsList);
+        datastore = morphia.createDatastore(client, Parameter.getInstance().getDbName());
+      }
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      e.printStackTrace(System.err);
+      System.exit(1);
+    }
+
+    return datastore;
   }
 
   private static void setLogLevel() {
